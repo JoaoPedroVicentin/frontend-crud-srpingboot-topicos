@@ -2,7 +2,7 @@ import { api } from '@/lib/axios';
 import { useQuery } from '@tanstack/react-query'
 import * as S from './styles'
 import { IDataReturn } from '@/interface/dataReturn.interface';
-import { Trash, Pencil, Plus } from 'phosphor-react';
+import { Trash, Pencil, Plus, GithubLogo } from 'phosphor-react';
 import { ChangeEvent, FormEvent, useState } from "react"
 
 export default function Home() {
@@ -275,6 +275,17 @@ function handleNewDataChange(event: ChangeEvent<HTMLInputElement>, context: 'pai
       <S.Header>
         <h1>Trabalho CRUD SpringBoot - Tópicos 4BCC</h1>
         <h2>Aluno: João Pedro Lopes Vicentin</h2>
+
+        <S.Github>
+          <a href='https://github.com/JoaoPedroVicentin/frontend-crud-srpingboot-topicos.git' target='_blank'>
+            <GithubLogo size={20} />
+            Repositório do frontend
+          </a>
+          <a href='https://github.com/JoaoPedroVicentin/crud-springboot-topicos.git' target='_blank'>
+            <GithubLogo size={20} />
+            Repositório do backend
+          </a>
+        </S.Github>
       </S.Header>
 
       <S.Body>

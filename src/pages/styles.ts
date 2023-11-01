@@ -11,7 +11,7 @@ export const Container = styled('div', {
 
 export const Header = styled('div', {
     backgroundColor: '#1F9090',
-    height: '18vh',
+    height: '25vh',
 
     display: 'flex',
     flexDirection: 'column',
@@ -24,7 +24,7 @@ export const Header = styled('div', {
 })
 
 export const Body = styled('div', {
-    height: '82vh',
+    height: '75vh',
     width: '100%',
 
     display: 'grid',
@@ -158,5 +158,24 @@ export const Loading = styled('div', {
     backgroundColor: '#C53535'
 })
 
+export const Github = styled('div', {
+    display: 'flex',
+    gap: '1.5rem',
+
+    a: {
+        backgroundColor: '#C53535',
+        width: 'fit-content',
+        padding: '0.5rem',
+
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '0.5rem',
+
+        textDecoration: 'none',
+
+        borderRadius: '4px'
+    }
+})
 
 
