@@ -79,7 +79,7 @@ export const DivButtons = styled('div', {
     gap: '1rem',
 })
 
-export const CreateElement = styled('div', {
+export const CreateElement = styled('form', {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -137,6 +137,25 @@ export const DeleteButton = styled('button', {
     padding: '0.5rem',
 
     color: 'white'
+})
+
+export const LoadingContainer = styled('div', {
+    position: 'absolute',
+
+    top: '50%',
+    left: '50%',
+
+    transform: 'translate(-50%, -50%)'
+})
+
+export const Loading = styled('div', {
+    position: 'absolute',
+    bottom: '0',
+    right: '0',
+
+    padding: '1rem 2rem',
+
+    backgroundColor: '#C53535'
 })
 
 

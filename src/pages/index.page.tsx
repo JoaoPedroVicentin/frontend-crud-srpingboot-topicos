@@ -1,11 +1,19 @@
 import { api } from '@/lib/axios';
 import { useQuery } from '@tanstack/react-query'
 import * as S from './styles'
-import { useState } from 'react';
 import { IDataReturn } from '@/interface/dataReturn.interface';
 import { Trash, Pencil, Plus } from 'phosphor-react';
+import { ChangeEvent, FormEvent, useState } from "react"
 
 export default function Home() {
+
+  const [isLoading, setIsLoading] = useState(false)
+
+  const [newPais, setNewPais] = useState<string>('')
+
+  const [newEstado, setNewEstado] = useState<string>('')
+
+  const [newCidade, setNewCidade] = useState<string>('')
 
   const [cidades, setCidades] = useState<IDataReturn[]>()
 
@@ -19,7 +27,7 @@ export default function Home() {
 
   const [thisCidade, setThisCidade] = useState<string | null>(null)
 
-  const { refetch: refetchCidades } = useQuery(['cidades'], async () => {
+  const { refetch: refetchCidades, isFetching: isFetchingCidades } = useQuery(['cidades'], async () => {
     const response = await api.get('/cidades/');
 
     setCidades(response.data)
@@ -27,7 +35,7 @@ export default function Home() {
     return response.data;
   }, { initialData:[]});
 
-  const { refetch: refetchEstados } = useQuery(['estados'], async () => {
+  const { refetch: refetchEstados, isFetching: isFetchingEstados } = useQuery(['estados'], async () => {
     const response = await api.get('/estados/');
 
     setEstados(response.data)
@@ -35,7 +43,7 @@ export default function Home() {
     return response.data;
   }, { initialData:[]});
 
-  const { refetch: refetchPaises } = useQuery(['paises'], async () => {
+  const { refetch: refetchPaises, isFetching: isFetchingPaises } = useQuery(['paises'], async () => {
     const response = await api.get('/paises/');
 
     setPaises(response.data)
@@ -43,14 +51,19 @@ export default function Home() {
     return response.data;
   }, { initialData:[]});
 
-  async function createPais(){
-    if(thisPais !== null){
+  async function createPais(event: FormEvent){
+
+    setIsLoading(true)
+
+    event.preventDefault()
+
+    if(newPais !== ''){
       try {
         await api.post('/paises/', {
-          name: thisPais
+          name: newPais
         });
   
-        setThisPais(null)
+        setNewPais('')
   
         refetchPaises()
   
@@ -58,17 +71,27 @@ export default function Home() {
       } catch (error) {
         return error
       }
+    }  else {
+      window.alert('Digite um valor válido')
     }
+
+    setIsLoading(false)
   }
 
-  async function createEstado(){
-    if(thisEstado !== null){
+  async function createEstado(event: FormEvent){
+
+    setIsLoading(true)
+
+    event.preventDefault()
+
+    if(newEstado !== ''){
+
       try {
         await api.post('/estados/', {
-          name: thisEstado
+          name: newEstado
         });
   
-        setThisEstado(null)
+        setNewEstado('')
   
         refetchEstados()
   
@@ -76,28 +99,45 @@ export default function Home() {
       } catch (error) {
         return error
       }
+      
+    } else {
+      window.alert('Digite um valor válido')
     }
+
+    setIsLoading(false)
   }
 
-  async function createCidade(){
-    if(thisCidade !== null){
-      try {
-        await api.post('/cidades/', {
-          name: thisCidade
-        });
-  
-        setThisCidade(null)
-  
-        refetchCidades()
-  
-        window.alert('Cidade cadastrada com sucesso')
-      } catch (error) {
-        return error
+  async function createCidade(event: FormEvent){
+
+    setIsLoading(true)
+
+    event.preventDefault()
+
+      if(newCidade !== ''){
+        try {
+          await api.post('/cidades/', {
+            name: newCidade
+          });
+    
+          setNewCidade('')
+    
+          refetchCidades()
+    
+          window.alert('Cidade cadastrada com sucesso')
+        } catch (error) {
+          return error
+        }
+      } else {
+        window.alert('Digite um valor válido')
       }
-    }
+
+      setIsLoading(false)
   }
 
   async function updatePais(id: string){
+
+    setIsLoading(true)
+
     if(thisPais !== null){
       try {
         await api.put(`/paises/${id}`, {
@@ -113,9 +153,14 @@ export default function Home() {
         return error
       }
     }
+
+    setIsLoading(false)
   }
 
   async function updateEstado(id: string){
+
+    setIsLoading(true)
+
     if(thisEstado !== null){
       try {
         await api.put(`/estados/${id}`, {
@@ -131,9 +176,14 @@ export default function Home() {
         return error
       }
     }
+
+    setIsLoading(false)
   }
 
   async function updateCidade(id: string){
+
+    setIsLoading(true)
+
     if(thisCidade !== null){
       try {
         await api.put(`/cidades/${id}`, {
@@ -149,9 +199,14 @@ export default function Home() {
         return error
       }
     }
+
+    setIsLoading(false)
   }
 
   async function deletePais(id: string){
+
+    setIsLoading(true)
+
     try {
       await api.delete(`/paises/${id}`);
 
@@ -161,9 +216,14 @@ export default function Home() {
     } catch (error) {
       return error
     }
+
+    setIsLoading(false)
   }
 
   async function deleteEstado(id: string){
+
+    setIsLoading(true)
+
     try {
       await api.delete(`/estados/${id}`);
 
@@ -173,9 +233,14 @@ export default function Home() {
     } catch (error) {
       return error
     }
+
+    setIsLoading(false)
   }
 
   async function deleteCidade(id: string){
+
+    setIsLoading(true)
+
     try {
       await api.delete(`/cidades/${id}`);
 
@@ -185,7 +250,23 @@ export default function Home() {
     } catch (error) {
       return error
     }
+
+    setIsLoading(false)
   }
+
+function handleNewDataChange(event: ChangeEvent<HTMLInputElement>, context: 'pais' | 'cidade' | 'estado'){
+  event.target.setCustomValidity('')
+  
+
+    if(context === 'pais'){
+      setNewPais(event.target.value)
+    } else if(context === 'cidade'){
+      setNewCidade(event.target.value)
+    } else if(context === 'estado'){
+      setNewEstado(event.target.value)
+    }
+  
+}
 
 
   return (
@@ -197,17 +278,20 @@ export default function Home() {
       </S.Header>
 
       <S.Body>
-        <S.DataColumn>
+        {!isFetchingCidades && !isFetchingEstados && !isFetchingPaises ? (
+          <>
+          <S.DataColumn>
         <h2>Países</h2>
-        <S.CreateElement>
-          <input placeholder='Cadastrar novo país' onFocus={(e) => (setThisPais(e.target.value))} onChange={(e) => setThisPais(e.target.value)} />
+        <S.CreateElement onSubmit={createPais}>
+          <input placeholder='Cadastrar novo país' value={newPais}  onChange={(e) => handleNewDataChange(e, 'pais')} />
           <S.DivButtons>
-              <S.AddButton type='button' onClick={() => createPais()}>
+              <S.AddButton type='submit'>
                 <Plus size={20} weight='bold' />
               </S.AddButton>
           </S.DivButtons>
         </S.CreateElement>
-          {paises?.map((pais, index) => {
+          {paises && paises.length > 0 ? 
+          paises.map((pais, index) => {
             return(
               <S.DivElement key={index}>
                 <input onFocus={(e) => (setThisPais(e.target.value))} defaultValue={pais.name} onChange={(e) => setThisPais(e.target.value)} />
@@ -221,47 +305,55 @@ export default function Home() {
                 </S.DivButtons>
               </S.DivElement>
             )
-          })}
+          })
+          : (
+            <p>Ainda não possui nenhum dado</p>
+          )}
         </S.DataColumn>
 
         <S.DataColumn>
         <h2>Estados</h2>
-        <S.CreateElement>
-          <input placeholder='Cadastrar novo estado' onFocus={(e) => (setThisEstado(e.target.value))} onChange={(e) => setThisEstado(e.target.value)} />
+        <S.CreateElement onSubmit={createEstado}>
+          <input placeholder='Cadastrar novo estado' value={newEstado}  onChange={(e) => handleNewDataChange(e, 'estado')} />
           <S.DivButtons>
-              <S.AddButton type='button' onClick={() => createEstado()}>
+              <S.AddButton type='submit'>
                 <Plus size={20} weight='bold' />
               </S.AddButton>
           </S.DivButtons>
         </S.CreateElement>
-          {estados?.map((estado, index) => {
-            return(
-              <S.DivElement key={index}>
-                <input onFocus={(e) => (setThisEstado(e.target.value))} defaultValue={estado.name} onChange={(e) => setThisEstado(e.target.value)} />
-                <S.DivButtons>
-                <S.EditButton type='button' onClick={() => updateEstado(estado.id)}>
-                  <Pencil size={20} weight='bold' />
-                </S.EditButton>
-                <S.DeleteButton type='button' onClick={() => deleteEstado(estado.id)}>
-                  <Trash size={20} weight='bold' />
-                </S.DeleteButton>
-                </S.DivButtons>
-              </S.DivElement>
-            )
-          })}
+          {estados && estados.length > 0 ? 
+            estados.map((estado, index) => {
+              return(
+                <S.DivElement key={index}>
+                  <input onFocus={(e) => (setThisEstado(e.target.value))} defaultValue={estado.name} onChange={(e) => setThisEstado(e.target.value)} />
+                  <S.DivButtons>
+                  <S.EditButton type='button' onClick={() => updateEstado(estado.id)}>
+                    <Pencil size={20} weight='bold' />
+                  </S.EditButton>
+                  <S.DeleteButton type='button' onClick={() => deleteEstado(estado.id)}>
+                    <Trash size={20} weight='bold' />
+                  </S.DeleteButton>
+                  </S.DivButtons>
+                </S.DivElement>
+              )
+            }
+          ) : (
+            <p>Ainda não possui nenhum dado</p>
+          )}
         </S.DataColumn>
 
         <S.DataColumn>
           <h2>Cidades</h2>
-          <S.CreateElement>
-          <input placeholder='Cadastrar nova cidade' onFocus={(e) => (setThisCidade(e.target.value))} onChange={(e) => setThisCidade(e.target.value)} />
-          <S.DivButtons>
-              <S.AddButton type='button' onClick={() => createCidade()}>
-                <Plus size={20} weight='bold' />
-              </S.AddButton>
-          </S.DivButtons>
+          <S.CreateElement onSubmit={createCidade}>
+            <input placeholder='Cadastrar nova cidade' value={newCidade}  onChange={(e) => handleNewDataChange(e, 'cidade')} />
+            <S.DivButtons>
+                <S.AddButton type='submit'>
+                  <Plus size={20} weight='bold' />
+                </S.AddButton>
+            </S.DivButtons>
         </S.CreateElement>
-          {cidades?.map((cidade, index) => {
+          {cidades && cidades.length > 0 ? 
+          cidades.map((cidade, index) => {
             return(
               <S.DivElement key={index}>
                 <input onFocus={(e) => (setThisCidade(e.target.value))} defaultValue={cidade.name} onChange={(e) => setThisCidade(e.target.value)} />
@@ -275,9 +367,23 @@ export default function Home() {
                 </S.DivButtons>
               </S.DivElement>
             )
-          })}
+          })
+          : (
+            <p>Ainda não possui nenhum dado</p>
+          )}
         </S.DataColumn>
+          </>
+        ) : 
+        <S.LoadingContainer>
+          <h1>Carregando dados ...</h1>
+        </S.LoadingContainer>
+        }
       </S.Body>
+      {isLoading && (
+        <S.Loading>
+          <h3>Carregando ...</h3>
+        </S.Loading>
+      )}
     </S.Container>
   )
 }
